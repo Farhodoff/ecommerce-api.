@@ -1,0 +1,35 @@
+const multer = require('multer');
+const path = require('path');
+
+// Rasmlar saqlanadigan joy va nom formati
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename(req, file, cb) {
+    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+  },
+});
+
+// Faqat rasm formatlarini qabul qilish
+function checkFileType(file, cb) {
+  const filetypes = /jpg|jpeg|png|webp/;
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = filetypes.test(file.mimetype);
+
+  if (extname && mimetype) {
+    return cb(null, true);
+  } else {
+    cb(new Error('Faqat rasm fayllari (jpg, jpeg, png, webp) qabul qilinadi!'));
+  }
+}
+
+const upload = multer({
+  storage,
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+});
+
+module.exports = upload;
