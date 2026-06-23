@@ -52,9 +52,14 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+// Vercel uchun app'ni export qilish (serverless)
+module.exports = app;
 
-app.listen(PORT, () => {
-  console.log(`Server is running in development mode on port ${PORT}`);
-  console.log(`API Docs: http://localhost:${PORT}/api-docs`);
-});
+// Faqat lokal muhitda (Vercel'da emas) serverni ishga tushirish
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server is running in development mode on port ${PORT}`);
+    console.log(`API Docs: http://localhost:${PORT}/api-docs`);
+  });
+}
